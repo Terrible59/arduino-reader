@@ -29,14 +29,13 @@ getPorts().then(list => {
             break
         case 1:
             console.log("Detect 1 port. Connect")
-            list[0].connect(9600)
-                .pipe(d => d.split(" ").map(Number))
-                .on_data(data => {
-                    wsServer.on('connection', con => {
-                        console.log('Соединение установлено');
+            wsServer.on('connection', con => {
+                list[0].connect(9600)
+                    .pipe(d => d.split(" ").map(Number))
+                    .on_data(data => {
                         con.send(JSON.stringify(data));
                     });
-                })
+            });
             break
 
         default:
