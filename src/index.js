@@ -7,18 +7,6 @@ const getPorts = require("./serial");
 const httpServer = http.createServer();
 const wsServer = new ws.Server({port: '3100'});
 
-function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
-}
-
-wsServer.on('connection', con => {
-    console.log('Соединение установлено');
-    setInterval(() => {
-        const randomData = [getRandomInt(60), getRandomInt(4), getRandomInt(1200), getRandomInt(3233), getRandomInt(333)];
-        con.send(JSON.stringify(randomData));
-    }, 5000);
-});
-
 httpServer.on('request', (req, res) => {
     if (req.url.includes('css')) {
         res.writeHead(200, { 'Content-Type': 'text/css' });
@@ -44,7 +32,10 @@ getPorts().then(list => {
             list[0].connect(9600)
                 .pipe(d => d.split(" ").map(Number))
                 .on_data(data => {
-                    console.log(data)
+                    wsServer.on('connection', con => {
+                        console.log('Соединение установлено');
+                        con.send(JSON.stringify(data));
+                    });
                 })
             break
 
