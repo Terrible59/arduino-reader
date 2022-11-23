@@ -9,9 +9,6 @@ const numbers = [
 ];
 
 for (let i = 0; i < 5; i++) {
-    if (numbers[i].error) {
-        console.log(numbers[i].error);
-    }
     numbers[i].start();
 }
 
@@ -29,6 +26,9 @@ ws.onmessage = (res) => {
     const date = (new Date()).toLocaleTimeString();
 
     for (let i = 0; i < 5; i++) {
+        if (Object.keys(chartData[i]).length == 5) {
+            delete chartData[i][Object.keys(chartData[i])[0]];
+        }
         chartData[i][date] = serverData[i];
         charts[i].update();
         numbers[i].update(serverData[i]);
