@@ -12,7 +12,6 @@ for (let i = 0; i < 5; i++) {
     numbers[i].start();
 }
 
-
 ws.onopen = () => {
     console.log('Online')
 }
@@ -26,7 +25,7 @@ ws.onmessage = (res) => {
     const date = (new Date()).toLocaleTimeString();
 
     for (let i = 0; i < 5; i++) {
-        if (Object.keys(chartData[i]).length == 5) {
+        if (Object.keys(chartData[i]).length == 7) {
             delete chartData[i][Object.keys(chartData[i])[0]];
         }
         chartData[i][date] = serverData[i];
@@ -35,7 +34,7 @@ ws.onmessage = (res) => {
     }
 }
 
-function makeChart(number, label) {
+function makeChart(number, label, color) {
     const ctx = document.getElementById(`chart${number + 1}`);
     return new Chart(ctx, {
         type: 'line',
@@ -44,7 +43,9 @@ function makeChart(number, label) {
           datasets: [{
             label: label,
             data: chartData[number],
-            borderWidth: 1
+            borderWidth: 1,
+            backgroundColor: color,
+            borderColor: color,
           }]
         },
         options: {
@@ -52,7 +53,8 @@ function makeChart(number, label) {
             y: {
               beginAtZero: true
             }
-          }
+          },
+          tension: 0.2,
         }
     });
 }
@@ -60,10 +62,9 @@ function makeChart(number, label) {
 const chartData = [{}, {}, {}, {}, {}];
 
 const charts = [
-    makeChart(0, 'Температура'),
-    makeChart(1, 'Температура'),
-    makeChart(2, 'Температура'),
-    makeChart(3, 'Температура'),
-    makeChart(4, 'Температура')
+    makeChart(0, 'Температура', '#D00000'),
+    makeChart(1, 'Скорость', '#FFBA08'),
+    makeChart(2, 'Давление', '#3F88C5'),
+    makeChart(3, 'Запас топлива', '#032B43'),
+    makeChart(4, 'Еще один датчик', '#136F63')
 ];
-
