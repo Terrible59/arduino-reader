@@ -1,0 +1,38 @@
+body {
+    font-family: 'Poppins', sans-serif !important;
+}
+
+.main {
+    padding: 25px 0;
+}
+
+.heading {
+    font-weight: bold;
+}
+
+.data-card-wrapper {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 50px;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+.data-card {
+    flex-basis: calc(33% - 30px);
+    max-width: calc(33% - 30px);
+    margin: 0 15px;
+    margin-bottom: 30px;
+}
+
+.data-card__heading {
+    color: rgb(179, 179, 179);
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.data-card__value {
+    font-size: 20px;
+    font-weight: bold;
+}
