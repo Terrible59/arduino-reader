@@ -60,6 +60,14 @@ ws.onmessage = (res) => {
             chart.chart.update();
         }
     } else {
+		const chartWrapperHtml = `
+		        <div class="data-item" data-item="${id_port}">
+		            <h4 class="data-item__heading">${id_port}</h4>
+		            <div class="data-card-wrapper">
+		            </div>
+		        </div>
+			`;
+			document.querySelector(`.container`).insertAdjacentHTML("beforeend", chartWrapperHtml);
         for (let i = 0; i < data.length; i++) {
             const chart = makeChart(materialColors[Math.floor(Math.random()*materialColors.length)], id_port, i);
             charts.push(chart);
@@ -69,15 +77,7 @@ ws.onmessage = (res) => {
 
 function makeChart(color, id_port, data_index) {
     const chart_id = gen_id.next().value;
-
-    const chartWrapperHtml = `
-            <div class="data-item" data-item="${id_port}">
-                <h4 class="data-item__heading">${id_port}</h4>
-                <div class="data-card-wrapper">
-                </div>
-            </div>
-    `;
-
+    
     const chart_html = `
             <div class="data-card">
                 <div class="data-card__value"><span id="number_${chart_id}">0</span></div>
@@ -86,8 +86,6 @@ function makeChart(color, id_port, data_index) {
                 </div>
             </div>
     `;
-
-    document.querySelector(`.container`).insertAdjacentHTML("beforeend", chartWrapperHtml);
     document.querySelector(`.data-item[data-item="${id_port}"] .data-card-wrapper`).insertAdjacentHTML("beforeend", chart_html);
     const ctx = document.getElementById(`chart_${chart_id}`);
 
