@@ -1,5 +1,24 @@
 const ws = new WebSocket('ws://localhost:3100');
 
+const materialColors = [
+    '#264653',
+    '#2a9d8f',
+    '#e9c46a',
+    '#f4a261',
+    '#e76f51',
+    '#023047',
+    '#d62828',
+    '#9b2226',
+    '#386641',
+    '#6d6875',
+    '#5f0f40',
+    '#e07a5f',
+    '#81b29a',
+    '#415a77',
+    '#6b705c',
+    '#fdc500',
+];
+
 function* generate_id() {
     for (let i = 0;; i++) {
         yield i;
@@ -42,7 +61,7 @@ ws.onmessage = (res) => {
         }
     } else {
         for (let i = 0; i < data.length; i++) {
-            const chart = makeChart('#D00000', id_port, i);
+            const chart = makeChart(materialColors[Math.floor(Math.random()*materialColors.length)], id_port, i);
             charts.push(chart);
         }
     }
@@ -51,16 +70,25 @@ ws.onmessage = (res) => {
 function makeChart(color, id_port, data_index) {
     const chart_id = gen_id.next().value;
 
+    const chartWrapperHtml = `
+            <div class="data-item" data-item="${id_port}">
+                <h4 class="data-item__heading">${id_port}</h4>
+                <div class="data-card-wrapper">
+                </div>
+            </div>
+    `;
+
     const chart_html = `
             <div class="data-card">
-                <div class="data-card__heading">${id_port}</div>
                 <div class="data-card__value"><span id="number_${chart_id}">0</span></div>
                 <div class="data-card__chart">
                     <canvas id="chart_${chart_id}"></canvas>
                 </div>
             </div>
     `;
-    document.querySelector(".data-card-wrapper").insertAdjacentHTML("beforeend", chart_html)
+
+    document.querySelector(`.container`).insertAdjacentHTML("beforeend", chartWrapperHtml);
+    document.querySelector(`.data-item[data-item="${id_port}"] .data-card-wrapper`).insertAdjacentHTML("beforeend", chart_html);
     const ctx = document.getElementById(`chart_${chart_id}`);
 
     const number = new countUp.CountUp(`number_${chart_id}`, 0, {decimalPlaces: 2, separator: ' '});
