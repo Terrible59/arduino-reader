@@ -20,26 +20,37 @@ httpServer.on('request', (req, res) => {
     }
 });
 
-httpServer.listen(8181);
+httpServer.listen(8181)
+console.log("http://localhost:8181/")
 
-getPorts().then(list => {
-    switch (list.length) {
-        case 0:
-            console.log("No ports")
-            break
-        case 1:
-            console.log("Detect 1 port. Connect")
-            wsServer.on('connection', con => {
-                list[0].connect(9600)
-                    .pipe(d => d.split(" ").map(Number))
-                    .on_data(data => {
-                        con.send(JSON.stringify(data));
-                    });
-            });
-            break
+const connects = []
+const ports = []
 
-        default:
-            console.log(`Detect ${list.length} ports:`)
-            list.map(console.log)
+setInterval(async () => {
+    const available_ports = await getPorts()
+    const connected_ports_names = ports.map((p) => p.name)
+    const new_ports = available_ports.filter(p => !connected_ports_names.includes(p.name))
+
+    for (const newPort of new_ports) {
+        console.log(`Connect ${newPort.name}`)
+        newPort.connect(9600)
+            .pipe(d => d.trim()
+                .split(" ")
+                .map(Number))
+            .on_data(data => {
+                for (const con of connects) {
+                    con.send(JSON.stringify({id_port: newPort.name, data}));
+                }
+            })
+            .on_close(() => {
+                console.log(`Close ${newPort.name}`)
+                ports.splice(ports.findIndex(p => p.name === newPort.name), 1)
+            })
+        ports.push(newPort)
     }
-})
+
+}, 1000)
+
+wsServer.on('connection', con => {
+    connects.push(con);
+});

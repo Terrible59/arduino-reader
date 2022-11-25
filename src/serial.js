@@ -13,6 +13,8 @@ class Port {
         this.port = new SerialPort({path: this.portInfo.path, baudRate})
         this.parser = this.port.pipe(new ReadlineParser())
 
+        this.port.on("error", () => {})
+
         return this
     }
 
@@ -28,6 +30,14 @@ class Port {
             }
             callback(data)
         })
+        return this;
+    }
+
+    on_close(callback) {
+        this.port.on("close", () => {
+            callback()
+        })
+        return this;
     }
 }
 
