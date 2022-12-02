@@ -26,8 +26,10 @@ function* generate_id() {
 }
 
 const gen_id = generate_id();
+const gen_port_id = generate_id();
 
-const charts = []
+const custom_port_ids = {};
+const charts = [];
 
 ws.onopen = () => {
     console.log('Online')
@@ -43,6 +45,7 @@ ws.onmessage = (res) => {
     const {id_port, data} = serverData;
 
     if (charts.map(ch => ch.id_port).includes(id_port)) {
+        const custom_id = custom_port_ids[id_port];
         const port_charts = charts.filter(chart => chart.id_port === id_port).sort((a, b) => a.data_index - b.data_index);
 
         for (let i = 0; i < data.length; i++) {
@@ -60,22 +63,25 @@ ws.onmessage = (res) => {
             chart.chart.update();
         }
     } else {
-		const chartWrapperHtml = `
-		        <div class="data-item" data-item="${id_port}">
+        const custom_port_id = gen_port_id.next().value;
+        custom_port_ids[id_port] = custom_port_id;
+	  const chartWrapperHtml = `
+		        <div class="data-item" data-item="${custom_port_id}">
 		            <h4 class="data-item__heading">${id_port}</h4>
 		            <div class="data-card-wrapper">
 		            </div>
 		        </div>
 			`;
-			document.querySelector(`.container`).insertAdjacentHTML("beforeend", chartWrapperHtml);
+	  document.querySelector(`.container`).insertAdjacentHTML("beforeend", chartWrapperHtml);
+
         for (let i = 0; i < data.length; i++) {
-            const chart = makeChart(materialColors[Math.floor(Math.random()*materialColors.length)], id_port, i);
+            const chart = makeChart(materialColors[Math.floor(Math.random()*materialColors.length)], id_port, i, custom_port_id);
             charts.push(chart);
         }
     }
 }
 
-function makeChart(color, id_port, data_index) {
+function makeChart(color, id_port, data_index, custom_port_id) {
     const chart_id = gen_id.next().value;
     
     const chart_html = `
@@ -86,7 +92,7 @@ function makeChart(color, id_port, data_index) {
                 </div>
             </div>
     `;
-    document.querySelector(`.data-item[data-item="${id_port}"] .data-card-wrapper`).insertAdjacentHTML("beforeend", chart_html);
+    document.querySelector(`.data-item[data-item="${custom_port_id}"] .data-card-wrapper`).insertAdjacentHTML("beforeend", chart_html);
     const ctx = document.getElementById(`chart_${chart_id}`);
 
     const number = new countUp.CountUp(`number_${chart_id}`, 0, {decimalPlaces: 2, separator: ' '});
@@ -96,6 +102,7 @@ function makeChart(color, id_port, data_index) {
     const labels = [];
 
     return {
+        custom_port_id,
         data,
         labels,
         data_index,
