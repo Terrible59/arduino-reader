@@ -45,3 +45,18 @@ body {
 .data-item__heading {
     margin-bottom: 25px;
 }
+
+.data-item-val {
+    font-size: 12px;
+}
+
+.data-item-val span{
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.data-item-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

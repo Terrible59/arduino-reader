@@ -31,6 +31,9 @@ const gen_port_id = generate_id();
 const custom_port_ids = {};
 const charts = [];
 
+const maximums = {};
+const averages = {};
+
 ws.onopen = () => {
     console.log('Online')
 }
@@ -59,6 +62,22 @@ ws.onmessage = (res) => {
             chart.labels.push(date);
             chart.data.push(data[i]);
 
+            if (!maximums[chart.chart_id] || data[i] > maximums[chart.chart_id]) {
+                maximums[chart.chart_id] = data[i];
+            }
+
+            if (!averages[chart.chart_id]) {
+                averages[chart.chart_id] = data[i];
+            } else {
+                averages[chart.chart_id] = (averages[chart.chart_id] + data[i]) / 2;
+            }
+
+            let average = document.querySelector(`.data-item-val_average[data-chart="${chart.chart_id}"]>span`);
+            let max = document.querySelector(`.data-item-val_max[data-chart="${chart.chart_id}"]>span`);
+
+            average.innerHTML = averages[chart.chart_id];
+            max.innerHTML = maximums[chart.chart_id];
+
             chart.number.update(data[i]);
             chart.chart.update();
         }
@@ -86,7 +105,11 @@ function makeChart(color, id_port, data_index, custom_port_id) {
     
     const chart_html = `
             <div class="data-card">
-                <div class="data-card__value"><span id="number_${chart_id}">0</span></div>
+                <div class="data-item-wrapper">
+                    <div class="data-card__value"><span id="number_${chart_id}">0</span></div>
+                    <div class="data-item-val data-item-val_max" data-chart="${chart_id}">Максимум: <span></span></div>
+                    <div class="data-item-val data-item-val_average" data-chart="${chart_id}">Среднее: <span></span></div>
+                </div>
                 <div class="data-card__chart">
                     <canvas id="chart_${chart_id}"></canvas>
                 </div>
